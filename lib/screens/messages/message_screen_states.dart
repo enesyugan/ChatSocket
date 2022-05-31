@@ -154,7 +154,14 @@ class _MessagesScreenState extends State<MessagesScreenState> {
         width: MediaQuery.of(context).size.width,
         child: Stack(
           children: [
-            Container(
+            GestureDetector(
+              onTap: (){
+                FocusScopeNode currentFocus = FocusScope.of(context);
+                if (!currentFocus.hasPrimaryFocus) {
+                  currentFocus.unfocus();
+                }
+                },
+              child: Container(
               height: MediaQuery.of(context).size.height-140,
               child: ListView.builder(
                 shrinkWrap: true,
@@ -168,6 +175,7 @@ class _MessagesScreenState extends State<MessagesScreenState> {
                 },
 
               ),
+             ),
             ),
             Align(
               alignment: Alignment.bottomCenter,
