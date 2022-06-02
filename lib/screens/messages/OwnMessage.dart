@@ -41,7 +41,8 @@ class OwnMessageCart extends StatelessWidget{
                 style: TextStyle(
                   fontSize: 13,
                   color: Colors.white,
-                ),),
+                ),
+                ),
               ),
             ],
           ),
