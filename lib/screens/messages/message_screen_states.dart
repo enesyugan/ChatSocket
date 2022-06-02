@@ -17,6 +17,8 @@ import 'package:date_time/date_time.dart';
 import '../../models/User.dart';
 import 'dart:convert';
 import 'dart:io';
+import 'package:shared_preferences/shared_preferences.dart';
+
 //import 'dart:async';
 //import 'dart:convert';
 
@@ -55,7 +57,8 @@ class _MessagesScreenState extends State<MessagesScreenState> {
   // });
 
   int toggleIndex = 0;
-  var DESTINATION_ADDRESS_ALL = InternetAddress("172.23.205.246");
+  late String PORT;
+  late var DESTINATION_ADDRESS_ALL;
   // var DESTINATION_ADDRESS=InternetAddress("141.3.25.174");
 
   // late Socket so;
@@ -69,9 +72,24 @@ class _MessagesScreenState extends State<MessagesScreenState> {
 
     //connect_socket();
     // connect_socket_asnyc();
+    get_prefs();
     widget.messageList = widget.messageListAlex;
     print("SDSDASDDAS?????????????????????????????????????????");
     print(widget.socket.connected);
+  }
+
+  void get_prefs() async {
+    var prefs = await SharedPreferences.getInstance();
+    String? ip_string = prefs.getString('IP_ADRESS');
+    String? port = prefs.getString('PORT');
+    if (ip_string == null || port == null) {
+      _navigateAndDisplaySelection(context);
+    } else {
+      this.PORT = port;
+      var x = prefs.getString('RANDO');
+      this.DESTINATION_ADDRESS_ALL = InternetAddress(ip_string);
+      print("get PREFS;: ${this.DESTINATION_ADDRESS_ALL}, ${this.PORT} ${x}");
+    }
   }
 
   void connect_socket() {
@@ -132,12 +150,13 @@ class _MessagesScreenState extends State<MessagesScreenState> {
     RawDatagramSocket.bind(InternetAddress.anyIPv4, 8889)
         .then((RawDatagramSocket udpSocket) {
       udpSocket.send(utf8.encode("${widget.selectedUser}:${message}"),
-          this.DESTINATION_ADDRESS_ALL, 59869);
+          this.DESTINATION_ADDRESS_ALL, int.parse(this.PORT));
     });
     print("Send to socket ${message}");
   }
 
   void write_message(String message) {
+    print("WRITE MESSAGE");
     if (message.length > 0) {
       set_message(message);
       widget._scrollController.animateTo(

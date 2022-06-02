@@ -12,21 +12,29 @@ class SettingsScreen extends StatelessWidget {
   final PWD_CTRL = TextEditingController();
   final PORT_CTRL = TextEditingController();
 
-  SettingsScreen();
-
-  @override
-  void initState() {
+  SettingsScreen() {
     get_prefs();
   }
 
   void get_prefs() async {
     // Obtain shared preferences.
     this.prefs = await SharedPreferences.getInstance();
+    String? ip_string = prefs.getString('IP_ADRESS');
+    String? port = prefs.getString('PORT');
+    if (ip_string != null) {
+      IP_ADDRESS_CTRL.text = ip_string;
+    }
+    if (port != null) {
+      PORT_CTRL.text = port;
+    }
   }
 
-  void on_save(String pw, String ip_adress, String port) {
+  void on_save(
+      String pw, String ip_adress, String port, BuildContext context) async {
+    //this.prefs = await SharedPreferences.getInstance();
     print("on saved ${pw}, ${ip_adress}, ${port}");
     set_prefs(pw, ip_adress, port);
+    Navigator.of(context).pop();
   }
 
   void set_prefs(String pw, String ip_adress, String port) async {
@@ -98,6 +106,7 @@ class SettingsScreen extends StatelessWidget {
                             hintText: "For example: 172.23.205.246",
                             floatingLabelBehavior: FloatingLabelBehavior.always,
                           ),
+                          style: TextStyle(fontWeight: FontWeight.bold),
                           onSaved: (value) {
                             print(value);
                           },
@@ -131,6 +140,7 @@ class SettingsScreen extends StatelessWidget {
                             hintText: "For example: 2022",
                             floatingLabelBehavior: FloatingLabelBehavior.always,
                           ),
+                          style: TextStyle(fontWeight: FontWeight.bold),
                           onSaved: (value) {
                             print(value);
                           },
@@ -174,7 +184,7 @@ class SettingsScreen extends StatelessWidget {
                         onPressed: () {
                           print("SAVE");
                           on_save(PWD_CTRL.text, IP_ADDRESS_CTRL.text,
-                              PORT_CTRL.text);
+                              PORT_CTRL.text, context);
                         },
                       ),
                     ],
