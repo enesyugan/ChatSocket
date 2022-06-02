@@ -4,6 +4,7 @@ import 'dart:core';
 //import 'dart:ffi';
 
 import 'package:asr_chat/screens/messages/OwnMessage.dart';
+import 'package:asr_chat/screens/messages/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:asr_chat/models/Message.dart';
 import 'package:asr_chat/models/User.dart';
@@ -19,50 +20,47 @@ import 'dart:io';
 //import 'dart:async';
 //import 'dart:convert';
 
-
 class MessagesScreenState extends StatefulWidget {
   User user;
   List<User> userList;
-  String selectedUser = "AlexWaibel";
+  String selectedUser = "2"; //"AlexWaibel";
   List<Message> messageListAlex = [];
   List<Message> messageListStockton = [];
   List<Message> messageList = [];
   bool sendButton = false;
   IO.Socket socket = IO.io("http://141.3.25.129:8080", <String, dynamic>{
-  "transports": ["websocket"],
-  "autoConnect": false,
+    "transports": ["websocket"],
+    "autoConnect": false,
   });
   //final conn = RedisConnection();
 
   TextEditingController _controller = TextEditingController();
   ScrollController _scrollController = ScrollController();
 
-
   MessagesScreenState({
     required this.user,
     required this.userList,
   });
 
-
   @override
   _MessagesScreenState createState() => _MessagesScreenState();
 }
-class _MessagesScreenState extends State<MessagesScreenState> {
 
+class _MessagesScreenState extends State<MessagesScreenState> {
 //  bool sendButton = false;
 // String selectedUser = "Alex";
- // IO.Socket socket = IO.io("http://192.21.23.3:5000", <String, dynamic>{
- // "transports": ["websocket"],
- // "autoConnect": false,
- // });
+  // IO.Socket socket = IO.io("http://192.21.23.3:5000", <String, dynamic>{
+  // "transports": ["websocket"],
+  // "autoConnect": false,
+  // });
 
   int toggleIndex = 0;
-  var DESTINATION_ADDRESS_ALL=InternetAddress("172.23.205.246");
- // var DESTINATION_ADDRESS=InternetAddress("141.3.25.174");
+  var DESTINATION_ADDRESS_ALL = InternetAddress("172.23.205.246");
+  // var DESTINATION_ADDRESS=InternetAddress("141.3.25.174");
 
   // late Socket so;
   @override
-  void initState(){
+  void initState() {
     print("initState");
     super.initState();
     print("=================================================");
@@ -70,77 +68,82 @@ class _MessagesScreenState extends State<MessagesScreenState> {
     print("=================================================");
 
     //connect_socket();
-   // connect_socket_asnyc();
+    // connect_socket_asnyc();
     widget.messageList = widget.messageListAlex;
     print("SDSDASDDAS?????????????????????????????????????????");
     print(widget.socket.connected);
   }
 
   void connect_socket() {
-   // this.socket = IO.io("http://192.21.23.3:5000", <String, dynamic>{
-   //   "transports": ["websocket"],
-   //   "autoConnect": false,
-   // });
+    // this.socket = IO.io("http://192.21.23.3:5000", <String, dynamic>{
+    //   "transports": ["websocket"],
+    //   "autoConnect": false,
+    // });
     print("ENES");
     widget.socket.connect;
     widget.socket.onConnect((data) => print("==========Connected========"));
   }
-  void connect_socket_asnyc() async{
+
+  void connect_socket_asnyc() async {
     Socket soc = await Socket.connect('172.17.64.130', 59869);
     soc.add(utf8.encode("message"));
-  //  print(this.so);
+    //  print(this.so);
     soc.close();
-    var DESTINATION_ADDRESS=InternetAddress("172.17.64.130");
+    var DESTINATION_ADDRESS = InternetAddress("172.17.64.130");
 
-    RawDatagramSocket.bind(InternetAddress.anyIPv4, 8889).then((RawDatagramSocket udpSocket) {
+    RawDatagramSocket.bind(InternetAddress.anyIPv4, 8889)
+        .then((RawDatagramSocket udpSocket) {
       udpSocket.broadcastEnabled = true;
-    // udpSocket.listen((e) {
-    //   var dg = udpSocket.receive();
-    //   if (dg != null) {
-    //     print("received ${dg.data}");
-    //   }
-    // });
-      List<int> data =utf8.encode('TEST');
+      // udpSocket.listen((e) {
+      //   var dg = udpSocket.receive();
+      //   if (dg != null) {
+      //     print("received ${dg.data}");
+      //   }
+      // });
+      List<int> data = utf8.encode('TEST');
       udpSocket.send(data, DESTINATION_ADDRESS, 59869);
     });
     print("ENES CONNECTED");
-}
+  }
 
-  void set_message(String message){
+  void set_message(String message) {
     DateTime now = DateTime.now();
     print(now.date);
     print(now.time);
     List<String> parts = now.time.toStringWithSeparator(':').split(':');
-    String hour_min = parts.sublist(0,parts.length-1).join(':').trim();
+    String hour_min = parts.sublist(0, parts.length - 1).join(':').trim();
     print(hour_min);
     Message m = new Message(
       sender: widget.user,
       time: hour_min,
-      text: message ,
+      text: message,
     );
 
     setState(() {
-      if (widget.selectedUser == "AlexWaibel") {
+      if (widget.selectedUser == "2") {
         widget.messageListAlex.add(m);
-      }
-      else{
+      } else {
         widget.messageListStockton.add(m);
       }
     });
   }
 
-  void send_to_socket(String message){
-    RawDatagramSocket.bind(InternetAddress.anyIPv4, 8889).then((RawDatagramSocket udpSocket) {
-      udpSocket.send(utf8.encode("${widget.selectedUser}:${message}"), this.DESTINATION_ADDRESS_ALL, 59869);
+  void send_to_socket(String message) {
+    RawDatagramSocket.bind(InternetAddress.anyIPv4, 8889)
+        .then((RawDatagramSocket udpSocket) {
+      udpSocket.send(utf8.encode("${widget.selectedUser}:${message}"),
+          this.DESTINATION_ADDRESS_ALL, 59869);
     });
     print("Send to socket ${message}");
   }
 
-  void write_message(String message){
+  void write_message(String message) {
     if (message.length > 0) {
       set_message(message);
-      widget._scrollController.animateTo(widget._scrollController.position.maxScrollExtent,
-          duration: Duration(milliseconds: 300), curve: Curves.easeOut);
+      widget._scrollController.animateTo(
+          widget._scrollController.position.maxScrollExtent,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeOut);
       send_to_socket(message);
     }
   }
@@ -155,27 +158,26 @@ class _MessagesScreenState extends State<MessagesScreenState> {
         child: Stack(
           children: [
             GestureDetector(
-              onTap: (){
+              onTap: () {
                 FocusScopeNode currentFocus = FocusScope.of(context);
                 if (!currentFocus.hasPrimaryFocus) {
                   currentFocus.unfocus();
                 }
-                },
+              },
               child: Container(
-              height: MediaQuery.of(context).size.height-140,
-              child: ListView.builder(
-                shrinkWrap: true,
-                controller: widget._scrollController,
-                itemCount: widget.messageList.length,
-                itemBuilder: (context, index){
-                  return OwnMessageCart(
-                    message: widget.messageList[index].text,
-                    time: widget.messageList[index].time,
-                  );
-                },
-
+                height: MediaQuery.of(context).size.height - 140,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  controller: widget._scrollController,
+                  itemCount: widget.messageList.length,
+                  itemBuilder: (context, index) {
+                    return OwnMessageCart(
+                      message: widget.messageList[index].text,
+                      time: widget.messageList[index].time,
+                    );
+                  },
+                ),
               ),
-             ),
             ),
             Align(
               alignment: Alignment.bottomCenter,
@@ -184,75 +186,71 @@ class _MessagesScreenState extends State<MessagesScreenState> {
                   Container(
                     width: MediaQuery.of(context).size.width - 55,
                     child: Card(
-                      margin: EdgeInsets.only(left: 2, right: 2, bottom: 8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      color: Colors.grey,
+                        margin: EdgeInsets.only(left: 2, right: 2, bottom: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        color: Colors.grey,
                         child: TextFormField(
                           controller: widget._controller,
                           textAlign: TextAlign.center,
                           keyboardType: TextInputType.multiline,
                           maxLines: 5,
                           minLines: 1,
-                          onChanged: (value){
-                            if (value.length > 0){
-                              setState((){
+                          onChanged: (value) {
+                            if (value.length > 0) {
+                              setState(() {
                                 widget.sendButton = true;
                                 widget.selectedUser = widget.selectedUser;
                               });
-                            }
-                            else {
+                            } else {
                               widget.sendButton = false;
                               widget.selectedUser = widget.selectedUser;
                             }
-                            if (widget.selectedUser=="AlexWaibel"){
+                            if (widget.selectedUser == "2") {
                               widget.messageList = widget.messageListAlex;
-                            }
-                            else{
+                            } else {
                               widget.messageList = widget.messageListStockton;
                             }
                           },
                           decoration: InputDecoration(
-                              hintText: "message to topside",
+                            hintText: "message to topside",
                             contentPadding: EdgeInsets.all(5),
                           ),
-                        )
+                        )),
+                  ),
+                  CircleAvatar(
+                    radius: 25,
+                    backgroundColor: Colors.blueAccent,
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.send,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        write_message(widget._controller.text);
+                        widget._controller.clear();
+                      },
                     ),
                   ),
-
-                CircleAvatar(
-                  radius: 25,
-                  backgroundColor: Colors.blueAccent,
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.send,
-                      color: Colors.white,
-                    ),
-                    onPressed: (){
-                      write_message(widget._controller.text);
-                      widget._controller.clear();
-                    },
-                  ),
-                ),
-              ],
-            ),
+                ],
+              ),
             ),
           ],
         ),
 
-    //  body: Column(
-    //    children: <Widget>[
-    //      Container(
-    //        color: Colors.amber,
-    //        height: 700,
-    //      ),
-    //      Text("adsasd"),
-    //      Container(
-    //        color: Colors.red,
-    //        child:
-    //        Text("222222"),
-    //      )
+        //  body: Column(
+        //    children: <Widget>[
+        //      Container(
+        //        color: Colors.amber,
+        //        height: 700,
+        //      ),
+        //      Text("adsasd"),
+        //      Container(
+        //        color: Colors.red,
+        //        child:
+        //        Text("222222"),
+        //      )
 //         Center(
 //           text: Text("Welcome to GeeksforGeeks!!!",
 //             style: TextStyle(
@@ -272,8 +270,10 @@ class _MessagesScreenState extends State<MessagesScreenState> {
       title: Row(
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.center, //Center Row contents horizontally,
-            crossAxisAlignment: CrossAxisAlignment.center, //Center Row contents vertically,
+            mainAxisAlignment:
+                MainAxisAlignment.center, //Center Row contents horizontally,
+            crossAxisAlignment:
+                CrossAxisAlignment.center, //Center Row contents vertically,
             mainAxisSize: MainAxisSize.min,
 
             children: <Widget>[
@@ -285,26 +285,35 @@ class _MessagesScreenState extends State<MessagesScreenState> {
                 labels: ['Alex', 'Stockton'],
                 onToggle: (index) {
                   print('===============switched to: $index ================');
-                  if(index==0){
-                    widget.selectedUser="AlexWaibel";
+                  if (index == 0) {
+                    widget.selectedUser = "2"; //"AlexWaibel";
                     widget.user = widget.userList[0];
                     print(widget.selectedUser);
                     print(widget.user);
-                    setState((){
-                    toggleIndex = 0;
-                    widget.messageList = widget.messageListAlex;
+                    setState(() {
+                      toggleIndex = 0;
+                      widget.messageList = widget.messageListAlex;
                     });
-                  }
-                  else {
-                    widget.selectedUser = "Stockton";
+                  } else {
+                    widget.selectedUser = "3"; //"Stockton";
                     widget.user = widget.userList[1];
                     print(widget.selectedUser);
-                    setState((){
+                    setState(() {
                       toggleIndex = 1;
                       widget.messageList = widget.messageListStockton;
                     });
                   }
                 },
+              ),
+              SizedBox(width: 10),
+              IconButton(
+                onPressed: () {
+                  _navigateAndDisplaySelection(context);
+                },
+                icon: Icon(
+                  Icons.settings,
+                  color: Colors.white,
+                ),
               ),
             ],
           )
@@ -312,9 +321,17 @@ class _MessagesScreenState extends State<MessagesScreenState> {
       ),
     );
   }
+
+  Future<void> _navigateAndDisplaySelection(BuildContext context) async {
+    // Navigator.push returns a Future that completes after calling
+    // Navigator.pop on the Selection Screen.
+    final result = await Navigator.push(
+      context,
+      // Create the SelectionScreen in the next step.
+      MaterialPageRoute(builder: (context) => SettingsScreen()),
+    );
+  }
 }
-
-
 
 //class MessagesScreen extends StatelessWidget {
 //  Duration duration = new Duration();
