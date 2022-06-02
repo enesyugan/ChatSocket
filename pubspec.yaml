@@ -33,6 +33,7 @@ dependencies:
   toggle_switch: ^2.0.1
   socket_io_client: ^1.0.2
   date_time: ^0.6.0
+n  shared_preferences: ^2.0.15
  # redis: ^3.1.0
   #dartis: ^0.5.0
 
