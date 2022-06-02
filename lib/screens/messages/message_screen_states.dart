@@ -86,9 +86,8 @@ class _MessagesScreenState extends State<MessagesScreenState> {
       _navigateAndDisplaySelection(context);
     } else {
       this.PORT = port;
-      var x = prefs.getString('RANDO');
       this.DESTINATION_ADDRESS_ALL = InternetAddress(ip_string);
-      print("get PREFS;: ${this.DESTINATION_ADDRESS_ALL}, ${this.PORT} ${x}");
+      print("get PREFS;: ${this.DESTINATION_ADDRESS_ALL}, ${this.PORT}");
     }
   }
 
