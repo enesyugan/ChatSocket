@@ -8,6 +8,7 @@ import 'package:asr_chat/screens/messages/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:asr_chat/models/Message.dart';
 import 'package:asr_chat/models/User.dart';
+import 'package:flutter/rendering.dart';
 //import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
@@ -59,6 +60,7 @@ class _MessagesScreenState extends State<MessagesScreenState> {
   int toggleIndex = 0;
   late String PORT;
   late var DESTINATION_ADDRESS_ALL;
+  double _message_container_height = double.infinity;
   // var DESTINATION_ADDRESS=InternetAddress("141.3.25.174");
 
   // late Socket so;
@@ -139,6 +141,7 @@ class _MessagesScreenState extends State<MessagesScreenState> {
     setState(() {
       if (widget.selectedUser == "2") {
         widget.messageListAlex.add(m);
+        //widget.messageListAlex.insert(0, m);
       } else {
         widget.messageListStockton.add(m);
       }
@@ -166,35 +169,58 @@ class _MessagesScreenState extends State<MessagesScreenState> {
     }
   }
 
+  void _scrollDown() {
+    print("SCROOOLLL");
+    widget._scrollController
+        .jumpTo(widget._scrollController.position.minScrollExtent);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: buildAppBar(), //AppBar(title: Text(this.user.name,)),
       body: Container(
-        height: MediaQuery.of(context).size.height,
+        height: MediaQuery.of(context).size.height - 80,
         width: MediaQuery.of(context).size.width,
+        // color: Colors.red,
         child: Stack(
+          //child: Column(
           children: [
-            GestureDetector(
-              onTap: () {
-                FocusScopeNode currentFocus = FocusScope.of(context);
-                if (!currentFocus.hasPrimaryFocus) {
-                  currentFocus.unfocus();
-                }
-              },
-              child: Container(
-                height: MediaQuery.of(context).size.height - 140,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  controller: widget._scrollController,
-                  itemCount: widget.messageList.length,
-                  itemBuilder: (context, index) {
-                    return OwnMessageCart(
-                      message: widget.messageList[index].text,
-                      time: widget.messageList[index].time,
-                    );
-                  },
+            // SingleChildScrollView(
+            // physics: ClampingScrollPhysics(),
+            Container(
+              child: GestureDetector(
+                onTap: () {
+                  FocusScopeNode currentFocus = FocusScope.of(context);
+                  if (!currentFocus.hasPrimaryFocus) {
+                    currentFocus.unfocus();
+                    this._message_container_height =
+                        MediaQuery.of(context).size.height - 140;
+                  }
+                  _scrollDown();
+                },
+                child: Container(
+                  height: this
+                      ._message_container_height, //MediaQuery.of(context).size.height - 140,
+                  //color: Colors.green,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    reverse: true,
+                    physics: ScrollPhysics(),
+                    controller: widget._scrollController,
+                    itemCount: widget.messageList.length,
+                    scrollDirection: Axis.vertical,
+                    itemBuilder: (context, index) {
+                      index = widget.messageList.length - 1 - index;
+                      return OwnMessageCart(
+                        message: widget.messageList[index].text,
+                        time: widget.messageList[index].time,
+                      );
+                    },
+                  ),
                 ),
+                // ),
               ),
             ),
             Align(
@@ -215,6 +241,10 @@ class _MessagesScreenState extends State<MessagesScreenState> {
                           keyboardType: TextInputType.multiline,
                           maxLines: 5,
                           minLines: 1,
+                          onTap: () {
+                            this._message_container_height =
+                                MediaQuery.of(context).size.height / 2 - 20;
+                          },
                           onChanged: (value) {
                             if (value.length > 0) {
                               setState(() {
@@ -248,6 +278,11 @@ class _MessagesScreenState extends State<MessagesScreenState> {
                       onPressed: () {
                         write_message(widget._controller.text);
                         widget._controller.clear();
+                        widget._scrollController.animateTo(
+                          0.0,
+                          curve: Curves.easeOut,
+                          duration: const Duration(milliseconds: 300),
+                        );
                       },
                     ),
                   ),
@@ -255,20 +290,20 @@ class _MessagesScreenState extends State<MessagesScreenState> {
               ),
             ),
           ],
-        ),
+          //  ),
 
-        //  body: Column(
-        //    children: <Widget>[
-        //      Container(
-        //        color: Colors.amber,
-        //        height: 700,
-        //      ),
-        //      Text("adsasd"),
-        //      Container(
-        //        color: Colors.red,
-        //        child:
-        //        Text("222222"),
-        //      )
+          //  body: Column(
+          //    children: <Widget>[
+          //      Container(
+          //        color: Colors.amber,
+          //        height: 700,
+          //      ),
+          //      Text("adsasd"),
+          //      Container(
+          //        color: Colors.red,
+          //        child:
+          //        Text("222222"),
+          //      )
 //         Center(
 //           text: Text("Welcome to GeeksforGeeks!!!",
 //             style: TextStyle(
@@ -278,6 +313,7 @@ class _MessagesScreenState extends State<MessagesScreenState> {
 //           ),
 //         ),
 //        ],
+        ),
       ),
     );
   }
