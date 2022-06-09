@@ -183,136 +183,17 @@ class _MessagesScreenState extends State<MessagesScreenState> {
       body: Container(
         height: MediaQuery.of(context).size.height - 80,
         width: MediaQuery.of(context).size.width,
-        // color: Colors.red,
-        child: Stack(
-          //child: Column(
-          children: [
-            // SingleChildScrollView(
-            // physics: ClampingScrollPhysics(),
-            Container(
-              child: GestureDetector(
-                onTap: () {
-                  FocusScopeNode currentFocus = FocusScope.of(context);
-                  if (!currentFocus.hasPrimaryFocus) {
-                    currentFocus.unfocus();
-                    this._message_container_height =
-                        MediaQuery.of(context).size.height - 140;
-                  }
-                  _scrollDown();
-                },
-                child: Container(
-                  height: this
-                      ._message_container_height, //MediaQuery.of(context).size.height - 140,
-                  //color: Colors.green,
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    reverse: true,
-                    physics: ScrollPhysics(),
-                    controller: widget._scrollController,
-                    itemCount: widget.messageList.length,
-                    scrollDirection: Axis.vertical,
-                    itemBuilder: (context, index) {
-                      index = widget.messageList.length - 1 - index;
-                      return OwnMessageCart(
-                        message: widget.messageList[index].text,
-                        time: widget.messageList[index].time,
-                      );
-                    },
-                  ),
-                ),
-                // ),
-              ),
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Row(
-                children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width - 55,
-                    child: Card(
-                        margin: EdgeInsets.only(left: 2, right: 2, bottom: 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                        color: Colors.grey,
-                        child: TextFormField(
-                          controller: widget._controller,
-                          textAlign: TextAlign.center,
-                          keyboardType: TextInputType.multiline,
-                          maxLines: 5,
-                          minLines: 1,
-                          onTap: () {
-                            this._message_container_height =
-                                MediaQuery.of(context).size.height / 2 - 20;
-                          },
-                          onChanged: (value) {
-                            if (value.length > 0) {
-                              setState(() {
-                                widget.sendButton = true;
-                                widget.selectedUser = widget.selectedUser;
-                              });
-                            } else {
-                              widget.sendButton = false;
-                              widget.selectedUser = widget.selectedUser;
-                            }
-                            if (widget.selectedUser == "2") {
-                              widget.messageList = widget.messageListAlex;
-                            } else {
-                              widget.messageList = widget.messageListStockton;
-                            }
-                          },
-                          decoration: InputDecoration(
-                            hintText: "message to topside",
-                            contentPadding: EdgeInsets.all(5),
-                          ),
-                        )),
-                  ),
-                  CircleAvatar(
-                    radius: 25,
-                    backgroundColor: Colors.blueAccent,
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.send,
-                        color: Colors.white,
-                      ),
-                      onPressed: () {
-                        write_message(widget._controller.text);
-                        widget._controller.clear();
-                        widget._scrollController.animateTo(
-                          0.0,
-                          curve: Curves.easeOut,
-                          duration: const Duration(milliseconds: 300),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-          //  ),
-
-          //  body: Column(
-          //    children: <Widget>[
-          //      Container(
-          //        color: Colors.amber,
-          //        height: 700,
-          //      ),
-          //      Text("adsasd"),
-          //      Container(
-          //        color: Colors.red,
-          //        child:
-          //        Text("222222"),
-          //      )
-//         Center(
-//           text: Text("Welcome to GeeksforGeeks!!!",
-//             style: TextStyle(
-//               color: Colors.black,
-//               fontSize: 40.0,
-//             ),
-//           ),
-//         ),
-//        ],
+        child: SingleChildScrollView(
+          // color: Colors.red,
+          //child: Stack(
+          child: Column(
+            children: <Widget>[
+              // SingleChildScrollView(
+              // physics: ClampingScrollPhysics(),
+              buildMessageList(),
+              buildTextInputArea(),
+            ],
+          ),
         ),
       ),
     );
@@ -372,6 +253,117 @@ class _MessagesScreenState extends State<MessagesScreenState> {
             ],
           )
         ],
+      ),
+    );
+  }
+
+  Widget buildMessageList() {
+    return Container(
+      child: GestureDetector(
+        onTap: () {
+          FocusScopeNode currentFocus = FocusScope.of(context);
+          if (!currentFocus.hasPrimaryFocus) {
+            currentFocus.unfocus();
+            this._message_container_height =
+                MediaQuery.of(context).size.height - 140;
+          }
+          _scrollDown();
+        },
+        child: Container(
+          height: MediaQuery.of(context).size.height - 140,
+          //MediaQuery.of(context).size.height - 140,
+          // color: Colors.green,
+          child: ListView.builder(
+            shrinkWrap: true,
+            reverse: true,
+            physics: ScrollPhysics(),
+            controller: widget._scrollController,
+            itemCount: widget.messageList.length,
+            scrollDirection: Axis.vertical,
+            itemBuilder: (context, index) {
+              index = widget.messageList.length - 1 - index;
+              return OwnMessageCart(
+                message: widget.messageList[index].text,
+                time: widget.messageList[index].time,
+              );
+            },
+          ),
+        ),
+        // ),
+      ),
+    );
+  }
+
+  Widget buildTextInputArea() {
+    return Container(
+      //height: MediaQuery.of(context).size.height * 0.2,
+      alignment: Alignment.bottomCenter,
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: Row(
+          children: [
+            Container(
+              width: MediaQuery.of(context).size.width - 55,
+              child: Card(
+                  margin: EdgeInsets.only(left: 2, right: 2, bottom: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  color: Colors.grey,
+                  child: TextFormField(
+                    controller: widget._controller,
+                    textAlign: TextAlign.center,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: 5,
+                    minLines: 1,
+                    onTap: () {
+                      print(MediaQuery.of(context).viewInsets.bottom);
+                      //this._message_container_height =
+                      //   MediaQuery.of(context).size.height / 2 - 20;
+                    },
+                    onChanged: (value) {
+                      if (value.length > 0) {
+                        setState(() {
+                          widget.sendButton = true;
+                          widget.selectedUser = widget.selectedUser;
+                        });
+                      } else {
+                        widget.sendButton = false;
+                        widget.selectedUser = widget.selectedUser;
+                      }
+                      if (widget.selectedUser == "2") {
+                        widget.messageList = widget.messageListAlex;
+                      } else {
+                        widget.messageList = widget.messageListStockton;
+                      }
+                    },
+                    decoration: InputDecoration(
+                      hintText: "message to topside",
+                      contentPadding: EdgeInsets.all(5),
+                    ),
+                  )),
+            ),
+            CircleAvatar(
+              radius: 25,
+              backgroundColor: Colors.blueAccent,
+              child: IconButton(
+                icon: Icon(
+                  Icons.send,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  write_message(widget._controller.text);
+                  widget._controller.clear();
+                  widget._scrollController.animateTo(
+                    0.0,
+                    curve: Curves.easeOut,
+                    duration: const Duration(milliseconds: 300),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
