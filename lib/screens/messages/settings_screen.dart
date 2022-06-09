@@ -1,4 +1,5 @@
 import 'dart:ffi';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -14,6 +15,25 @@ class SettingsScreen extends StatelessWidget {
 
   SettingsScreen() {
     get_prefs();
+  }
+
+  bool ip_address_check(String ip_address) {
+    print(ip_address);
+    if (ip_address == "") {
+      print("empty");
+      return false;
+    }
+    try {
+      print("trying ...");
+      var x = InternetAddress(ip_address);
+    } on Exception catch (_) {
+      print("EXCEPTION");
+      return false;
+    } catch (error) {
+      print("ERRRROR");
+      return false;
+    }
+    return true;
   }
 
   void get_prefs() async {
@@ -182,17 +202,38 @@ class SettingsScreen extends StatelessWidget {
                       ElevatedButton(
                         child: Text('Save'),
                         onPressed: () {
-                          print("SAVE");
                           print(PWD_CTRL.text);
-                          if (PWD_CTRL.text == "4000") {
-                            on_save(PWD_CTRL.text, IP_ADDRESS_CTRL.text,
-                                PORT_CTRL.text, context);
-                          } else {
+                          print(IP_ADDRESS_CTRL.text);
+                          print(PORT_CTRL.text);
+                          if (PWD_CTRL.text != "4000") {
                             showDialog(
                                 context: context,
-                                builder: (BuildContext context) => AlertDialog(
-                                      title: const Text("Wrong Passwort"),
+                                builder: (BuildContext context) =>
+                                    const AlertDialog(
+                                      title: Text("Wrong Passwort"),
                                     ));
+                          } else if (!ip_address_check(IP_ADDRESS_CTRL.text)) {
+                            {
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) =>
+                                      const AlertDialog(
+                                        title: Text(
+                                            "IP has incorrect format or is empty"),
+                                      ));
+                            }
+                          } else if (PORT_CTRL.text == "") {
+                            {
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) =>
+                                      const AlertDialog(
+                                        title: Text("Port cant be empty"),
+                                      ));
+                            }
+                          } else {
+                            on_save(PWD_CTRL.text, IP_ADDRESS_CTRL.text,
+                                PORT_CTRL.text, context);
                           }
                         },
                       ),
