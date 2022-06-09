@@ -296,8 +296,12 @@ class _MessagesScreenState extends State<MessagesScreenState> {
 
   Widget buildTextInputArea() {
     return Container(
-      //height: MediaQuery.of(context).size.height * 0.2,
+      //height:  //MediaQuery.of(context).size.height * 0.1,
+      //height: 70,
+      margin: EdgeInsets.only(left: 2, right: 2, bottom: 10),
+      width: MediaQuery.of(context).size.width,
       alignment: Alignment.bottomCenter,
+      //color: Colors.amber,
       child: Align(
         alignment: Alignment.bottomCenter,
         child: Row(
@@ -305,7 +309,7 @@ class _MessagesScreenState extends State<MessagesScreenState> {
             Container(
               width: MediaQuery.of(context).size.width - 55,
               child: Card(
-                  margin: EdgeInsets.only(left: 2, right: 2, bottom: 8),
+                  margin: EdgeInsets.only(left: 2, right: 2, bottom: 1),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(25),
                   ),
