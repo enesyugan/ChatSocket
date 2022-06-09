@@ -348,6 +348,8 @@ class _MessagesScreenState extends State<MessagesScreenState> {
       // Create the SelectionScreen in the next step.
       MaterialPageRoute(builder: (context) => SettingsScreen()),
     );
+    this.DESTINATION_ADDRESS_ALL = InternetAddress(result[0]);
+    this.PORT = result[1];
   }
 }
 

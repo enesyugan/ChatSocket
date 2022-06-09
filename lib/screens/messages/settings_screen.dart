@@ -34,7 +34,7 @@ class SettingsScreen extends StatelessWidget {
     //this.prefs = await SharedPreferences.getInstance();
     print("on saved ${pw}, ${ip_adress}, ${port}");
     set_prefs(pw, ip_adress, port);
-    Navigator.of(context).pop();
+    Navigator.of(context).pop([ip_adress, port]);
   }
 
   void set_prefs(String pw, String ip_adress, String port) async {
@@ -179,12 +179,21 @@ class SettingsScreen extends StatelessWidget {
                           },
                         ),
                       ),
-                      RaisedButton(
+                      ElevatedButton(
                         child: Text('Save'),
                         onPressed: () {
                           print("SAVE");
-                          on_save(PWD_CTRL.text, IP_ADDRESS_CTRL.text,
-                              PORT_CTRL.text, context);
+                          print(PWD_CTRL.text);
+                          if (PWD_CTRL.text == "4000") {
+                            on_save(PWD_CTRL.text, IP_ADDRESS_CTRL.text,
+                                PORT_CTRL.text, context);
+                          } else {
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) => AlertDialog(
+                                      title: const Text("Wrong Passwort"),
+                                    ));
+                          }
                         },
                       ),
                     ],
