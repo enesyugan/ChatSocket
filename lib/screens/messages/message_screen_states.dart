@@ -151,7 +151,7 @@ class _MessagesScreenState extends State<MessagesScreenState> {
   void send_to_socket(String message) {
     RawDatagramSocket.bind(InternetAddress.anyIPv4, 8889)
         .then((RawDatagramSocket udpSocket) {
-      udpSocket.send(utf8.encode("${widget.selectedUser}:${message}"),
+      udpSocket.send(utf8.encode("[Request]${widget.selectedUser}:${message}"),
           this.DESTINATION_ADDRESS_ALL, int.parse(this.PORT));
     });
     print("Send to socket ${message}");
