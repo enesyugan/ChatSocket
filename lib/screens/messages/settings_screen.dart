@@ -69,7 +69,20 @@ class SettingsScreen extends StatelessWidget {
         leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () => {
-                  Navigator.of(context).pop(),
+                  if (IP_ADDRESS_CTRL.text == "")
+                    {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) => const AlertDialog(
+                                title: Text(
+                                    "Pleases insert ip adress and port number"),
+                              ))
+                    }
+                  else
+                    {
+                      Navigator.of(context)
+                          .pop([IP_ADDRESS_CTRL.text, PORT_CTRL.text]),
+                    },
                 }),
         title: Text("Settings"),
         centerTitle: true,
