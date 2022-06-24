@@ -19,6 +19,8 @@ import '../../models/User.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:enum_to_string/enum_to_string.dart';
+import 'package:http/http.dart' as http;
 
 //import 'dart:async';
 //import 'dart:convert';
@@ -49,6 +51,8 @@ class MessagesScreenState extends StatefulWidget {
   _MessagesScreenState createState() => _MessagesScreenState();
 }
 
+enum ConnectionParameter { UDP, API }
+
 class _MessagesScreenState extends State<MessagesScreenState> {
 //  bool sendButton = false;
 // String selectedUser = "Alex";
@@ -60,6 +64,8 @@ class _MessagesScreenState extends State<MessagesScreenState> {
   int toggleIndex = 0;
   late String PORT;
   late var DESTINATION_ADDRESS_ALL;
+  ConnectionParameter? CONNECTION_TYPE = ConnectionParameter.UDP;
+
   double _message_container_height = double.infinity;
   // var DESTINATION_ADDRESS=InternetAddress("141.3.25.174");
 
@@ -84,12 +90,17 @@ class _MessagesScreenState extends State<MessagesScreenState> {
     var prefs = await SharedPreferences.getInstance();
     String? ip_string = prefs.getString('IP_ADRESS');
     String? port = prefs.getString('PORT');
-    if (ip_string == null || port == null) {
+    String? con = prefs.getString('Connection_TYPE');
+
+    if (ip_string == null || port == null || con == null) {
       _navigateAndDisplaySelection(context);
     } else {
       this.PORT = port;
       this.DESTINATION_ADDRESS_ALL = InternetAddress(ip_string);
-      print("get PREFS;: ${this.DESTINATION_ADDRESS_ALL}, ${this.PORT}");
+      this.CONNECTION_TYPE =
+          EnumToString.fromString(ConnectionParameter.values, con);
+      print(
+          "get PREFS;: ${this.DESTINATION_ADDRESS_ALL}, ${this.PORT}, ${this.CONNECTION_TYPE}");
     }
   }
 
@@ -157,6 +168,26 @@ class _MessagesScreenState extends State<MessagesScreenState> {
     print("Send to socket ${message}");
   }
 
+  void send_to_api(String message) {
+    var res = http.post(
+      // Uri.parse("https://c253-141-3-25-29.eu.ngrok.io/video_generate"),
+      Uri.parse("http://10.172.15.186:8081/video_generate"),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        "speaker": "AlexWaibel",
+        "text": message,
+        "start": "1.0",
+        "end": "3.0",
+        "ww_session": "0",
+        "segment_tag": "0",
+        "is_text_only": "1",
+      }),
+    );
+    print(res);
+  }
+
   void write_message(String message) {
     print("WRITE MESSAGE");
     if (message.length > 0) {
@@ -165,7 +196,11 @@ class _MessagesScreenState extends State<MessagesScreenState> {
           widget._scrollController.position.maxScrollExtent,
           duration: Duration(milliseconds: 300),
           curve: Curves.easeOut);
-      send_to_socket(message);
+      if (this.CONNECTION_TYPE == ConnectionParameter.UDP) {
+        send_to_socket(message);
+      } else {
+        send_to_api(message);
+      }
     }
   }
 
@@ -382,6 +417,8 @@ class _MessagesScreenState extends State<MessagesScreenState> {
     );
     this.DESTINATION_ADDRESS_ALL = InternetAddress(result[0]);
     this.PORT = result[1];
+    this.CONNECTION_TYPE =
+        EnumToString.fromString(ConnectionParameter.values, result[2]);
   }
 }
 
